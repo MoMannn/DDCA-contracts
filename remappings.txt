@@ -1,0 +1,5 @@
+@metamask/delegation-framework/=lib/delegation-framework/src/
+@openzeppelin/contracts/=lib/delegation-framework/lib/openzeppelin-contracts/contracts/
+@erc7579/=lib/delegation-framework/lib/erc7579-implementation/src/
+forge-std/=lib/forge-std/src/
+
