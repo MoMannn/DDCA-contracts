@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
-import {DDCA} from "../src/DDCA.sol";
+import {DDCAEtherex} from "../src/DDCAEtherex.sol";
 import {IEtherexRouter, Route} from "../src/interfaces/IEtherexRouter.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IDelegationManager} from "@metamask/delegation-framework/interfaces/IDelegationManager.sol";
@@ -13,8 +13,8 @@ import {ERC20TransferAmountEnforcer} from "../lib/delegation-framework/src/enfor
 import {ERC20PeriodTransferEnforcer} from "../lib/delegation-framework/src/enforcers/ERC20PeriodTransferEnforcer.sol";
 import {Delegation, Caveat} from "@metamask/delegation-framework/utils/Types.sol";
 
-contract DDCATest is BaseTest {
-    DDCA public ddca;
+contract DDCAEtherexTest is BaseTest {
+    DDCAEtherex public ddca;
 
     IEtherexRouter public constant ETHEREX_ROUTER = IEtherexRouter(0x32dB39c56C171b4c96e974dDeDe8E42498929c54);
     IERC20 public constant MUSD = IERC20(0xacA92E438df0B2401fF60dA7E4337B687a2435DA);
@@ -39,7 +39,7 @@ contract DDCATest is BaseTest {
         super.setUp();
 
         vm.createSelectFork(vm.envString("LINEA_RPC_URL"), MAINNET_FORK_BLOCK);
-        ddca = new DDCA(address(ETHEREX_ROUTER), address(delegationManager));
+        ddca = new DDCAEtherex(address(ETHEREX_ROUTER), address(delegationManager));
         ddca.setAllowedFromToken(address(MUSD), true);
         ddca.setAllowedFromToken(address(USDC), true);
         ddca.setAllowedToToken(NATIVE_TOKEN, true);
@@ -92,14 +92,10 @@ contract DDCATest is BaseTest {
         Delegation memory transferDelegation =
             _createTransferDelegation(address(ddca), address(USDC), amountIn);
 
-        vm.startPrank(users.alice.addr);
-
         Delegation[] memory delegations_ = new Delegation[](1);
         delegations_[0] = transferDelegation;
 
         ddca.swapByDelegation(delegations_, _buildRoute(address(USDC), NATIVE_TOKEN), amountIn, true);
-
-        vm.stopPrank();
 
         console.log("alice USDC after swap by delegation", USDC.balanceOf(address(users.alice.deleGator)));
         console.log("alice ETH after swap by delegation", address(users.alice.deleGator).balance);
@@ -115,8 +111,6 @@ contract DDCATest is BaseTest {
         Route[] memory routes_ = _buildRoute(address(USDC), NATIVE_TOKEN);
         Delegation memory transferDelegation =
             _createPeriodDelegation(address(ddca), address(USDC), amountIn, 7 days, block.timestamp + 1 days);
-
-        vm.startPrank(users.alice.addr);
 
         Delegation[] memory delegations_ = new Delegation[](1);
         delegations_[0] = transferDelegation;
@@ -136,8 +130,6 @@ contract DDCATest is BaseTest {
         vm.warp(block.timestamp + 7 days);
 
         ddca.swapByDelegation(delegations_, routes_, amountIn, true);
-
-        vm.stopPrank();
 
         assertEq(USDC.balanceOf(address(users.alice.deleGator)), initialUSDCBalance - amountIn);
 
@@ -274,14 +266,10 @@ contract DDCATest is BaseTest {
         Delegation memory transferDelegation =
             _createTransferDelegation(address(ddca), address(USDC), amountIn);
 
-        vm.startPrank(users.alice.addr);
-
         Delegation[] memory delegations_ = new Delegation[](1);
         delegations_[0] = transferDelegation;
 
         ddca.swapByDelegation(delegations_, _buildRoute(address(USDC), NATIVE_TOKEN), amountIn, true);
-
-        vm.stopPrank();
 
         uint256 ownerUSDCAfter = USDC.balanceOf(owner);
         uint256 expectedFee = ddca.minimumFee(); // Should be 100000 (0.1 USDC)
@@ -314,14 +302,10 @@ contract DDCATest is BaseTest {
         Delegation memory transferDelegation =
             _createTransferDelegation(address(ddca), address(USDC), amountIn);
 
-        vm.startPrank(users.alice.addr);
-
         Delegation[] memory delegations_ = new Delegation[](1);
         delegations_[0] = transferDelegation;
 
         ddca.swapByDelegation(delegations_, _buildRoute(address(USDC), NATIVE_TOKEN), amountIn, true);
-
-        vm.stopPrank();
 
         uint256 ownerUSDCAfter = USDC.balanceOf(owner);
         

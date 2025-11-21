@@ -2,10 +2,10 @@
 pragma solidity ^0.8.13;
 
 import {Script} from "forge-std/Script.sol";
-import {DDCA} from "../src/DDCA.sol";
+import {DDCAEtherex} from "../src/DDCAEtherex.sol";
 
-contract DeployDDCA is Script {
-    DDCA public ddca;
+contract DeployDDCAEtherex is Script {
+    DDCAEtherex public ddca;
 
     function setUp() public {}
 
@@ -16,7 +16,7 @@ contract DeployDDCA is Script {
         address swapAddress = address(0);
         address delegationManager = address(0);
         
-        ddca = new DDCA(swapAddress, delegationManager);
+        ddca = new DDCAEtherex(swapAddress, delegationManager);
 
         vm.stopBroadcast();
     }

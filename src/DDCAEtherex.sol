@@ -12,7 +12,7 @@ import { IEtherexRouter, Route } from "./interfaces/IEtherexRouter.sol";
 
 /// @title DDCA - Decentralized Dollar Cost Averaging
 /// @author @MoMannn
-contract DDCA is Ownable2Step {
+contract DDCAEtherex is Ownable2Step {
 
     using SafeERC20 for IERC20;
     
@@ -108,9 +108,6 @@ contract DDCA is Ownable2Step {
         
         // Deadline for the swap (10 minutes from now)
         uint256 deadline_ = block.timestamp + 600;
-
-        address tokenFrom_ = _routes[0].from;
-        address tokenTo_ = _routes[_routes.length - 1].to;
         
         // Handle different swap scenarios
         if (!_isNativeToToken) {
@@ -215,7 +212,12 @@ contract DDCA is Ownable2Step {
     /// @param _routes Routes to swap
     /// @param _amount Amount of source token to swap
     /// @param _isNativeToToken Whether we want to swap to native (automatically from WETH to ETH)
-    function swapByDelegation(Delegation[] memory _delegations, Route[] memory _routes, uint256 _amount, bool _isNativeToToken) external {
+    function swapByDelegation(
+        Delegation[] memory _delegations,
+        Route[] memory _routes,
+        uint256 _amount,
+        bool _isNativeToToken
+    ) public onlyOwner {
         if (_routes.length == 0) revert InvalidRoutesLength();
         address tokenFrom_ = _routes[0].from;
         address tokenTo_ = _routes[_routes.length - 1].to;
